@@ -19,9 +19,9 @@
 
 #include "LT_app.h"
 
-#include "pointcloud/pointcloud.hpp"
+//#include "pointcloud/pointcloud.hpp"
 #include "cluster.hpp"
-#include "util/color.h"
+//#include "util/color.h"
 
 namespace algo {
 

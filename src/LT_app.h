@@ -6,6 +6,8 @@ constexpr char* APP_TITLE = "BrAIn (c) 2025";
 ///constexpr char* ECAL_TITLE = "LT GEN";
 ///constexpr char* ECAL_INIT_OK = "GEN eCAL publishers initialized";
 
+int bg_color[3] = { 135,130,121 }; // r,g,b
+
 char* _strcat(char* a, char* b) {
   char buf[255];
   strcpy(buf, a);

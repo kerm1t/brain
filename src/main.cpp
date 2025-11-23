@@ -45,28 +45,7 @@ bool b_newframe = false;
 
 #include "init.hpp"
 #include "user.hpp"
-///#include "app_ecal.hpp"
-///#include "app_algowrp.hpp"
-
-/*
-  ------------------------------------------------
-  Mutex:
-  - run
-  - render
-  - publish
-  ------------------------------------------------
-*/
-/*
-void run_with_Mutex() {
-  const std::lock_guard<std::recursive_mutex> lock(m_SubscriberMutex);
-//  frs::frs_run(p, &fFanDef, p_freespace);
-  algo::run_cluster_pts();
-}
-void render_with_Mutex(SDL_Window* window) {
-  const std::lock_guard<std::recursive_mutex> lock(m_SubscriberMutex);
-  render(window, p.numpoints);
-}
-*/
+#include "database.hpp"
 
 /*
   ------------------------------------------------
@@ -88,8 +67,6 @@ int main(int argc, char** argv)
 {
   user::init_Cfg();
 
-//  app_ecal::init(argc, argv);
-
 // Init GFX
   SDL_Window* window = init_SDL();
 
@@ -97,6 +74,10 @@ int main(int argc, char** argv)
 
   init_GlEW(); // expects context exists
 
+  db::db_open("..//brain.db3");
+  std::string note = db::sql_string("SELECT note from notes WHERE id=5;");
+  user::editor.SetText(note);
+//  ImGuiWindowFlags_NoScrollWithMouse();
   // openGL: init GPU structures
   gpu_create_shaders();
   gpu_create_buffers();
@@ -116,7 +97,8 @@ int main(int argc, char** argv)
 // Init GFX
 
   user::editor.SetPalette(TextEditor::GetLightPalette());
-
+  ImGui::StyleColorsLight();
+  
   // Loop
   bool close = false;
   do
@@ -158,13 +140,12 @@ int main(int argc, char** argv)
     }
   } while (!close);
 
-//  app_ecal::exit();
-
   gpu_free_buffers(); // free point cloud vbo
   grid_free(); 
   axes_free();
   
   SDL_Quit();
+  db::db_close();
 
   return 0;
 }
