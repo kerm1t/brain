@@ -10,6 +10,7 @@
 #ifndef USER_HPP
 #define USER_HPP
 
+#include "database.hpp"
 
 namespace user {
   static int mx, my; // mouse-pos
@@ -188,6 +189,8 @@ namespace user {
 
       ImGui::Begin(COMP_NAME);                               // Create an ImGUI window called <COMP> and append into it.
       if (ImGui::Button("Update DB")) {                           // Buttons return true when clicked (most widgets return true when edited/activated)
+//        db::write_sql("Note from BrAIn at run time");
+        db::sql_update(editor.GetText());
       }
       editor.Render("TextEditor");
       ImGui::End();
