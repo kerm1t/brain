@@ -1,0 +1,15 @@
+out/
+bin/
+build/
+escapi.opensdf
+escapi.sdf
+/target/*
+
+bld/
+.vs/
+
+lib/
+*.log
+*.tmp
+Debug/
+Release/
