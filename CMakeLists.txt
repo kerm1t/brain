@@ -5,7 +5,7 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON) # eCAL/proto
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../)
 
 #if (MSVC)
-  set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD 17)
 #endif()
 
 if (UNIX)
@@ -26,7 +26,7 @@ find_package(SDL2 REQUIRED)
 set(glew "glew-2.1.0")
 set(IMGUI_FOLDER imgui)
 
-include_directories(. ./src src/math
+include_directories(. ./src src/math src/database
 ./lib/${glew}/include
 ${SDL2_INCLUDE_DIRS}
 ${IMGUI_FOLDER}
@@ -67,14 +67,15 @@ src/draw_primitives.hpp
 src/shader/start.fs
 src/shader/start.vs
 # rbnn
-src/cluster.hpp
-src/kdtree.h
+#src/cluster.hpp
+#src/kdtree.h
 # dbscan
 #src/dbscan.cpp
-src/dbscan.hpp
-src/nanoflann.hpp
+#src/dbscan.hpp
+#src/nanoflann.hpp
 src/math/linmath.h
 src/database.hpp
+src/database/sqlite3.c
 )
 
 target_link_libraries(${PROJECT_NAME}
