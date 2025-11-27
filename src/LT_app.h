@@ -1,8 +1,8 @@
 #ifndef LT_APP_H
 #define LT_APP_H
 
-constexpr char* COMP_NAME = "BrAIn";
-constexpr char* APP_TITLE = "BrAIn (c) 2025";
+constexpr char* COMP_NAME = "br[AI]n";
+constexpr char* APP_TITLE = "br[AI]n (c) 2025";
 ///constexpr char* ECAL_TITLE = "LT GEN";
 ///constexpr char* ECAL_INIT_OK = "GEN eCAL publishers initialized";
 
