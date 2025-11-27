@@ -16,6 +16,8 @@ namespace user {
   static int mx, my; // mouse-pos
   static int dmx, dmy; // mouse-delta
 
+  std::vector<const char*> list_items;
+
 
 //  bool b_cfg_changed{ false };
   namespace insta {
@@ -186,6 +188,14 @@ namespace user {
     {
       static float f = 0.0f;
       static int counter = 0;
+
+      ImGui::Begin("found");
+//      const char* items[] = { "Apple", "Banana", "Cherry", "Kiwi", "Mango", "Orange", "Pineapple", "Strawberry", "Watermelon" };
+      static int item_current = 1;
+//      ImGui::ListBox("listbox", &item_current, items, IM_ARRAYSIZE(items), 4);
+      ImGui::ListBox("topics", &item_current, list_items.data(), static_cast<int>(list_items.size()), 30);
+      ImGui::End();
+
 
       ImGui::Begin(COMP_NAME);                               // Create an ImGUI window called <COMP> and append into it.
       if (ImGui::Button("Update DB")) {                           // Buttons return true when clicked (most widgets return true when edited/activated)

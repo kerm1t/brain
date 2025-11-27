@@ -77,6 +77,12 @@ int main(int argc, char** argv)
   db::db_open("..//brain.db3");
   std::string note = db::sql_string("SELECT note from notes WHERE id=5;");
   user::editor.SetText(note);
+
+  db::sql_rows("SELECT topic from notes;");
+  user::list_items.reserve(db::rows_val.size());
+  for (auto& s : db::rows_val)
+    user::list_items.push_back(s.c_str());
+
 //  ImGuiWindowFlags_NoScrollWithMouse();
   // openGL: init GPU structures
   gpu_create_shaders();
@@ -98,7 +104,7 @@ int main(int argc, char** argv)
 
   user::editor.SetPalette(TextEditor::GetLightPalette());
   ImGui::StyleColorsLight();
-  
+
   // Loop
   bool close = false;
   do

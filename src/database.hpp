@@ -1,3 +1,11 @@
+/*
+  Database helper functions for SQLite
+
+  CREATE TABLE notes (id integer, note text, created real, modified real, tags text, link text, img blob);
+  
+  ALTER TABLE notes ADD COLUMN topic TEXT;
+
+*/
 #ifndef DATABASE_HPP
 #define DATABASE_HPP
 
@@ -11,6 +19,7 @@ namespace db {
 
   sqlite3* db;
   std::string fld_value;
+  std::vector<std::string> rows_val;
 
 CStringA UTF16toUTF8(const CStringW& utf16)
 {
@@ -102,6 +111,17 @@ void escape_apostrophe(std::string& str) {
     return 0;
   }
 
+  static int callback_rows(void* data, int argc, char** argv, char** azColName) {
+    int i;
+    fprintf(stderr, "%s: ", (const char*)data);
+
+    for (i = 0; i < argc; i++) {
+      rows_val.push_back(argv[i]);
+//      rows_val.insert(rows_val.end(), argv[i], argv[i] + strlen(argv[i]));
+    }
+    return 0;
+  }
+
   void read_sql() {
     char* zErrMsg = 0;
     int rc;
@@ -143,6 +163,27 @@ void escape_apostrophe(std::string& str) {
     }
 
     return fld_value;
+  }
+
+//  std::vector<std::string> sql_rows(const std::string& sql) {
+  void sql_rows(const std::string & sql) {
+    char* zErrMsg = 0;
+    int rc;
+    const char* data = "Callback function called";
+    
+    rows_val.clear();
+    /* Execute SQL statement */
+    rc = sqlite3_exec(db, sql.c_str(), callback_rows, (void*)data, &zErrMsg);
+
+    if (rc != SQLITE_OK) {
+      fprintf(stderr, "SQL error: %s\n", zErrMsg);
+      sqlite3_free(zErrMsg);
+    }
+    else {
+      fprintf(stdout, "Operation done successfully\n");
+    }
+
+//    return rows_val;
   }
 
 
