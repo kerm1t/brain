@@ -20,6 +20,7 @@ namespace db {
   sqlite3* db;
   std::string fld_value;
   std::vector<std::string> rows_val;
+///  std::vector<long> rows_id;
 
 CStringA UTF16toUTF8(const CStringW& utf16)
 {
@@ -118,6 +119,7 @@ void escape_apostrophe(std::string& str) {
     for (i = 0; i < argc; i++) {
       rows_val.push_back(argv[i]);
 //      rows_val.insert(rows_val.end(), argv[i], argv[i] + strlen(argv[i]));
+///      rows_id.push_back(std::stol(argv[0]));
     }
     return 0;
   }
@@ -184,6 +186,31 @@ void escape_apostrophe(std::string& str) {
     }
 
 //    return rows_val;
+  }
+
+  void sql_search_topics(const char* buf, std::vector<const char*>* list_items) {
+    char* zErrMsg = 0;
+    int rc;
+    const char* data = "Callback function called";
+
+    std::string buf_ = buf;
+    /* Create SQL statement */
+//    std::string sql = "SELECT * FROM notes WHERE note LIKE '%" + buf_ + "%';";
+    std::string sql = "SELECT id, topic FROM notes WHERE note LIKE '%" + buf_ + "%';";
+
+    rows_val.clear();
+    /* Execute SQL statement */
+    rc = sqlite3_exec(db, sql.c_str(), callback_rows, (void*)data, &zErrMsg);
+    for (auto& s : db::rows_val)
+      list_items->push_back(s.c_str());
+
+    if (rc != SQLITE_OK) {
+      fprintf(stderr, "SQL error: %s\n", zErrMsg);
+      sqlite3_free(zErrMsg);
+    }
+    else {
+      fprintf(stdout, "Operation done successfully\n");
+    }
   }
 
 

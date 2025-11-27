@@ -109,7 +109,6 @@ int main(int argc, char** argv)
   bool close = false;
   do
   {
-//    render_with_Mutex(window);
     render(window);
 
     user::Imgui_draw(window, io);
@@ -128,6 +127,8 @@ int main(int argc, char** argv)
     }
 
     SDL_GL_SwapWindow(window); // dbl buffer
+    
+    user::Imgui_events();
 
     // user interaction (mouse, keys, ...)
     SDL_Event event;

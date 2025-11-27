@@ -17,6 +17,8 @@ namespace user {
   static int dmx, dmy; // mouse-delta
 
   std::vector<const char*> list_items;
+  static int item_current = 1;
+  char prevbuf[256];
 
 
 //  bool b_cfg_changed{ false };
@@ -188,12 +190,21 @@ namespace user {
     {
       static float f = 0.0f;
       static int counter = 0;
+      static char buf[256];
 
       ImGui::Begin("found");
-//      const char* items[] = { "Apple", "Banana", "Cherry", "Kiwi", "Mango", "Orange", "Pineapple", "Strawberry", "Watermelon" };
-      static int item_current = 1;
-//      ImGui::ListBox("listbox", &item_current, items, IM_ARRAYSIZE(items), 4);
+      ImGui::InputText("string", buf, IM_ARRAYSIZE(buf));
+      if (std::strncmp(buf, prevbuf, sizeof(prevbuf)) != 0) {
+        // search in DB
+        list_items.clear();
+        db::sql_search_topics(buf, &list_items);
+      }
+      strcpy_s(prevbuf, sizeof(prevbuf), buf);
+
+
+      // fill listbox with topics from DB
       ImGui::ListBox("topics", &item_current, list_items.data(), static_cast<int>(list_items.size()), 30);
+      if (ImGui::IsItemHovered()) ImGui::SetTooltip("ListBox hovered %d", item_current);
       ImGui::End();
 
 
@@ -208,6 +219,13 @@ namespace user {
     // Rendering
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  }
+
+  void Imgui_events() {
+    static bool selected = false;
+
+    if (ImGui::IsMouseClicked(0)) {
+    }
   }
 
 } // namespace user
