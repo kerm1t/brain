@@ -196,7 +196,7 @@ void escape_apostrophe(std::string& str) {
     std::string buf_ = buf;
     /* Create SQL statement */
 //    std::string sql = "SELECT * FROM notes WHERE note LIKE '%" + buf_ + "%';";
-    std::string sql = "SELECT id, topic FROM notes WHERE note LIKE '%" + buf_ + "%';";
+    std::string sql = "SELECT topic FROM notes WHERE note LIKE '%" + buf_ + "%';";
 
     rows_val.clear();
     /* Execute SQL statement */
