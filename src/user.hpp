@@ -1,9 +1,10 @@
 /*
-  LT-Stack
+  User interaction handling
+  partially generic module
+
   (C) 2025
   author: w.schulz
 
-  FRS - Freespace and Road Boundaries => make generic
   json, user input, insta algo-rerun, event handling
 */
 
@@ -19,6 +20,20 @@ namespace user {
   std::vector<const char*> list_items;
   static int item_current = 1;
   char prevbuf[256];
+// s. database.hpp -->  struct note { ... };
+
+  enum e_STATE { STATE_NONE, STATE_NEW, STATE_EDIT };
+  e_STATE curr_state = STATE_NONE;
+
+
+  struct s_Note {
+    char topic[256];
+    double created;
+    double modified;
+    std::string note;
+    char tags[256];
+  };
+  s_Note s_note;
 
 
 //  bool b_cfg_changed{ false };
@@ -120,9 +135,8 @@ namespace user {
       {
       }
     }
-
-
   }
+
   void user_event_SDL(SDL_Event& event) { // this is SDL --> move it to ImGUI
     if (event.type == SDL_MOUSEWHEEL)
     {
@@ -136,6 +150,7 @@ namespace user {
       }
     }
   }
+
   void win_event_SDL(SDL_Event& event) {
     if (event.type == SDL_DROPFILE) {      // In case if dropped file
       char* dropped_filedir = event.drop.file;
@@ -193,7 +208,7 @@ namespace user {
       static char buf[256];
 
       ImGui::Begin("found");
-      ImGui::InputText("string", buf, IM_ARRAYSIZE(buf));
+      ImGui::InputText("search", buf, IM_ARRAYSIZE(buf));
       if (std::strncmp(buf, prevbuf, sizeof(prevbuf)) != 0) {
         // search in DB
         list_items.clear();
@@ -209,10 +224,33 @@ namespace user {
 
 
       ImGui::Begin(COMP_NAME);                               // Create an ImGUI window called <COMP> and append into it.
+      if (ImGui::Button("New DB entry")) {
+        user::editor.SetText("");
+        s_note.topic[0] = '\0';
+        s_note.tags[0] = '\0';
+        item_current = -1;
+        curr_state = STATE_NEW;
+      }
+      ImGui::SameLine();
       if (ImGui::Button("Update DB")) {                           // Buttons return true when clicked (most widgets return true when edited/activated)
 //        db::write_sql("Note from BrAIn at run time");
-        db::sql_update(editor.GetText());
+        switch (curr_state) {
+          case STATE_NONE:
+            std::cout << "No changes to save." << std::endl;
+            break;
+          case STATE_NEW:
+            db::sql_insert(editor.GetText());
+            curr_state = STATE_EDIT;
+            break;
+          case STATE_EDIT:
+            db::sql_update(editor.GetText());
+            break;
+        }
       }
+      ImGui::InputText("topic", s_note.topic, IM_ARRAYSIZE(s_note.topic));
+      ImGui::InputText("tags", buf, IM_ARRAYSIZE(buf));
+      ImGui::InputText("created", buf, IM_ARRAYSIZE(buf));
+      ImGui::InputText("modified", buf, IM_ARRAYSIZE(buf));
       editor.Render("TextEditor");
       ImGui::End();
     }
@@ -223,12 +261,18 @@ namespace user {
 
   void Imgui_events() {
     static bool selected = false;
-//    ImGui::IsItemHovered();
- //   fprintf(stderr, "%d: ", item_current);
-    if (ImGui::IsMouseClicked(0)) {
+
+    // 2do, compensate text editor delay
+    // (1) https://github.com/ChemistAion/ImTextEdit ... hmm,jo aber liegt nicht am TextEditor, Problem auch bei InputText
+    // (2) https://github.com/ocornut/imgui/issues/1485
+    if (ImGui::IsMouseClicked(0) && item_current >= 0) {
       std::string sid = std::to_string(db::rows_id[item_current]);
+      std::string topic = db::sql_string("SELECT topic from notes WHERE id=" + sid + ";"); // Ugly, but works
+      strcpy(s_note.topic,topic.c_str());
       std::string note = db::sql_string("SELECT note from notes WHERE id="+sid+";");
       user::editor.SetText(note);
+//      user::editor.Render("TextEditor");
+      item_current = -1;
     }
   }
 

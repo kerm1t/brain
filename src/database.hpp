@@ -22,75 +22,75 @@ namespace db {
   std::vector<std::string> rows_val;
   std::vector<long> rows_id;
 
-CStringA UTF16toUTF8(const CStringW& utf16)
-{
-   CStringA utf8;
-   int len = WideCharToMultiByte(CP_UTF8, 0, utf16, -1, NULL, 0, 0, 0);
-   if (len>1)
-   { 
-      char *ptr = utf8.GetBuffer(len-1);
-      if (ptr) WideCharToMultiByte(CP_UTF8, 0, utf16, -1, ptr, len, 0, 0);
-      utf8.ReleaseBuffer();
-   }
-   return utf8;
-}
-
-CStringW UTF8toUTF16(const CStringA& utf8)
-{
-   CStringW utf16;
-   int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
-   if (len>1)
-   { 
-      wchar_t *ptr = utf16.GetBuffer(len-1);
-      if (ptr) MultiByteToWideChar(CP_UTF8, 0, utf8, -1, ptr, len);
-      utf16.ReleaseBuffer();
-   }
-   return utf16;
-}
-
-void escape_escape_sequences(std::string& str) {
-  std::pair<char, char> const sequences[]{
-    { '\a', 'a' },
-    { '\b', 'b' },
-    { '\f', 'f' },
-    { '\n', 'n' },
-    { '\r', 'r' },
-    { '\t', 't' },
-    { '\v', 'v' },
-  };
-
-  for (size_t i = 0; i < str.length(); ++i) {
-    char* const c = str.data() + i;
-
-    for (auto const seq : sequences) {
-      if (*c == seq.first) {
-        *c = seq.second;
-        str.insert(i, "\\");
-        ++i; // to account for inserted "\\"
-        break;
-      }
-    }
+  CStringA UTF16toUTF8(const CStringW& utf16)
+  {
+     CStringA utf8;
+     int len = WideCharToMultiByte(CP_UTF8, 0, utf16, -1, NULL, 0, 0, 0);
+     if (len>1)
+     { 
+        char *ptr = utf8.GetBuffer(len-1);
+        if (ptr) WideCharToMultiByte(CP_UTF8, 0, utf16, -1, ptr, len, 0, 0);
+        utf8.ReleaseBuffer();
+     }
+     return utf8;
   }
-}
 
-void escape_apostrophe(std::string& str) {
-  std::pair<char, char> const sequences[]{
-    { '\'', '"' }
+  CStringW UTF8toUTF16(const CStringA& utf8)
+  {
+     CStringW utf16;
+     int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
+     if (len>1)
+     { 
+        wchar_t *ptr = utf16.GetBuffer(len-1);
+        if (ptr) MultiByteToWideChar(CP_UTF8, 0, utf8, -1, ptr, len);
+        utf16.ReleaseBuffer();
+     }
+     return utf16;
+  }
+
+  void escape_escape_sequences(std::string& str) {
+    std::pair<char, char> const sequences[]{
+      { '\a', 'a' },
+      { '\b', 'b' },
+      { '\f', 'f' },
+      { '\n', 'n' },
+      { '\r', 'r' },
+      { '\t', 't' },
+      { '\v', 'v' },
     };
 
-  for (size_t i = 0; i < str.length(); ++i) {
-    char* const c = str.data() + i;
+    for (size_t i = 0; i < str.length(); ++i) {
+      char* const c = str.data() + i;
 
-    for (auto const seq : sequences) {
-      if (*c == seq.first) {
-        *c = seq.second;
-//        str.insert(i, "\\");
-        ++i; // to account for inserted "\\"
-        break;
+      for (auto const seq : sequences) {
+        if (*c == seq.first) {
+          *c = seq.second;
+          str.insert(i, "\\");
+          ++i; // to account for inserted "\\"
+          break;
+        }
       }
     }
   }
-}
+
+  void escape_apostrophe(std::string& str) {
+    std::pair<char, char> const sequences[]{
+      { '\'', '"' }
+      };
+
+    for (size_t i = 0; i < str.length(); ++i) {
+      char* const c = str.data() + i;
+
+      for (auto const seq : sequences) {
+        if (*c == seq.first) {
+          *c = seq.second;
+  //        str.insert(i, "\\");
+          ++i; // to account for inserted "\\"
+          break;
+        }
+      }
+    }
+  }
 // argc = ncolumns
   // argv[i] = column
   static int callback(void* data, int argc, char** argv, char** azColName) {
@@ -227,7 +227,7 @@ void escape_apostrophe(std::string& str) {
   }
 
 
-  void write_sql(const std::string& note) {
+  void sql_insert(const std::string& note) {
     char* zErrMsg = 0;
     int rc;
     /* Create SQL statement */
