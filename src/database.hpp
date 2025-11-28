@@ -20,7 +20,7 @@ namespace db {
   sqlite3* db;
   std::string fld_value;
   std::vector<std::string> rows_val;
-///  std::vector<long> rows_id;
+  std::vector<long> rows_id;
 
 CStringA UTF16toUTF8(const CStringW& utf16)
 {
@@ -112,15 +112,28 @@ void escape_apostrophe(std::string& str) {
     return 0;
   }
 
-  static int callback_rows(void* data, int argc, char** argv, char** azColName) {
+  /*
+  static int callback_rows_singlefld(void* data, int argc, char** argv, char** azColName) {
     int i;
     fprintf(stderr, "%s: ", (const char*)data);
 
     for (i = 0; i < argc; i++) {
-      rows_val.push_back(argv[i]);
-//      rows_val.insert(rows_val.end(), argv[i], argv[i] + strlen(argv[i]));
-///      rows_id.push_back(std::stol(argv[0]));
+      rows_val.push_back(argv[1]);
     }
+    return 0;
+  }
+  */
+
+  // works for 2 fields: id, topic
+  static int callback_rows(void* data, int argc, char** argv, char** azColName) {
+    int i;
+    fprintf(stderr, "%s: ", (const char*)data);
+
+///    for (i = 0; i < argc; i++) {
+      rows_val.push_back(argv[1]);
+//      rows_val.insert(rows_val.end(), argv[i], argv[i] + strlen(argv[i]));
+      rows_id.push_back(std::stol(argv[0]));
+///    }
     return 0;
   }
 
@@ -196,7 +209,7 @@ void escape_apostrophe(std::string& str) {
     std::string buf_ = buf;
     /* Create SQL statement */
 //    std::string sql = "SELECT * FROM notes WHERE note LIKE '%" + buf_ + "%';";
-    std::string sql = "SELECT topic FROM notes WHERE note LIKE '%" + buf_ + "%';";
+    std::string sql = "SELECT id, topic FROM notes WHERE note LIKE '%" + buf_ + "%';";
 
     rows_val.clear();
     /* Execute SQL statement */

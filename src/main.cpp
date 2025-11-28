@@ -78,7 +78,7 @@ int main(int argc, char** argv)
   std::string note = db::sql_string("SELECT note from notes WHERE id=5;");
   user::editor.SetText(note);
 
-  db::sql_rows("SELECT topic from notes;");
+  db::sql_rows("SELECT id, topic from notes;");
   user::list_items.reserve(db::rows_val.size());
   for (auto& s : db::rows_val)
     user::list_items.push_back(s.c_str());
@@ -112,6 +112,7 @@ int main(int argc, char** argv)
     render(window);
 
     user::Imgui_draw(window, io);
+    user::Imgui_events();
 
     bool b_cfg_changed = user::insta_config();
 
@@ -127,8 +128,6 @@ int main(int argc, char** argv)
     }
 
     SDL_GL_SwapWindow(window); // dbl buffer
-    
-    user::Imgui_events();
 
     // user interaction (mouse, keys, ...)
     SDL_Event event;

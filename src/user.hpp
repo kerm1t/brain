@@ -223,8 +223,12 @@ namespace user {
 
   void Imgui_events() {
     static bool selected = false;
-
+//    ImGui::IsItemHovered();
+ //   fprintf(stderr, "%d: ", item_current);
     if (ImGui::IsMouseClicked(0)) {
+      std::string sid = std::to_string(db::rows_id[item_current]);
+      std::string note = db::sql_string("SELECT note from notes WHERE id="+sid+";");
+      user::editor.SetText(note);
     }
   }
 
