@@ -22,6 +22,16 @@ namespace db {
   std::vector<std::string> rows_val;
   std::vector<long> rows_id;
 
+  struct s_Note {
+    char topic[256];
+    double created;
+    double modified;
+    std::string note;
+    char tags[256];
+    char origin[256]; 
+  };
+
+
   CStringA UTF16toUTF8(const CStringW& utf16)
   {
      CStringA utf8;
@@ -227,12 +237,31 @@ namespace db {
   }
 
 
-  void sql_insert(const std::string& note) {
+  void sql_insert_1fld(const std::string& note) {
     char* zErrMsg = 0;
     int rc;
     /* Create SQL statement */
     std::string sql = "INSERT INTO notes (ID,note) "  \
       "VALUES (5, '" + note + "');";
+
+    /* Execute SQL statement */
+    rc = sqlite3_exec(db, sql.c_str(), callback, 0, &zErrMsg);
+
+    if (rc != SQLITE_OK) {
+      fprintf(stderr, "SQL error: %s\n", zErrMsg);
+      sqlite3_free(zErrMsg);
+    }
+    else {
+      fprintf(stdout, "Records created successfully\n");
+    }
+  }
+
+  void sql_insert(const s_Note& s_note) {
+    char* zErrMsg = 0;
+    int rc;
+    /* Create SQL statement */
+    std::string sql = "INSERT INTO notes (note,topic,tags,origin) "  \
+      "VALUES ('" + s_note.note + "', '" + s_note.topic + "', '" + s_note.tags + "', '" + s_note.origin + "');";
 
     /* Execute SQL statement */
     rc = sqlite3_exec(db, sql.c_str(), callback, 0, &zErrMsg);

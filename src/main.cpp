@@ -75,10 +75,10 @@ int main(int argc, char** argv)
   init_GlEW(); // expects context exists
 
   db::db_open("..//brain.db3");
-  std::string note = db::sql_string("SELECT note from notes WHERE id=5;");
+  std::string note = db::sql_string("SELECT note from notes WHERE rowid=5;");
   user::editor.SetText(note);
 
-  db::sql_rows("SELECT id, topic from notes;");
+  db::sql_rows("SELECT rowid, topic from notes;");
   user::list_items.reserve(db::rows_val.size());
   for (auto& s : db::rows_val)
     user::list_items.push_back(s.c_str());

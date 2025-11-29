@@ -25,16 +25,9 @@ namespace user {
   enum e_STATE { STATE_NONE, STATE_NEW, STATE_EDIT };
   e_STATE curr_state = STATE_NONE;
 
+  db::s_Note s_note;
 
-  struct s_Note {
-    char topic[256];
-    double created;
-    double modified;
-    std::string note;
-    char tags[256];
-  };
-  s_Note s_note;
-
+  bool mouse_clicked = false;
 
 //  bool b_cfg_changed{ false };
   namespace insta {
@@ -196,12 +189,20 @@ namespace user {
     }
   } // Imgui_io
 
+  void update_detail() {
+    std::string sid = std::to_string(db::rows_id[item_current]);
+    std::string topic = db::sql_string("SELECT topic from notes WHERE rowid=" + sid + ";"); // Ugly, but works
+    strcpy(s_note.topic, topic.c_str());
+    std::string note = db::sql_string("SELECT note from notes WHERE rowid=" + sid + ";");
+    user::editor.SetText(note);
+    item_current = -1;
+    mouse_clicked = false;
+  }
 
   void Imgui_draw(SDL_Window* window, ImGuiIO& io) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-
     {
       static float f = 0.0f;
       static int counter = 0;
@@ -216,10 +217,11 @@ namespace user {
       }
       strcpy_s(prevbuf, sizeof(prevbuf), buf);
 
-
+      if (mouse_clicked) update_detail();
       // fill listbox with topics from DB
       ImGui::ListBox("topics", &item_current, list_items.data(), static_cast<int>(list_items.size()), 30);
       if (ImGui::IsItemHovered()) ImGui::SetTooltip("ListBox hovered %d", item_current);
+      printf("%d", item_current);
       ImGui::End();
 
 
@@ -234,23 +236,28 @@ namespace user {
       ImGui::SameLine();
       if (ImGui::Button("Update DB")) {                           // Buttons return true when clicked (most widgets return true when edited/activated)
 //        db::write_sql("Note from BrAIn at run time");
+        s_note.note = editor.GetText();
         switch (curr_state) {
           case STATE_NONE:
             std::cout << "No changes to save." << std::endl;
             break;
           case STATE_NEW:
-            db::sql_insert(editor.GetText());
+            db::sql_insert(s_note);
             curr_state = STATE_EDIT;
             break;
           case STATE_EDIT:
-            db::sql_update(editor.GetText());
+            db::sql_update(editor.GetText()); // 2do: pass s_note
             break;
         }
       }
+      ImGui::SameLine();
+      curr_state == STATE_EDIT ? ImGui::Text("EDIT") : 
+        (curr_state == STATE_NEW ? ImGui::Text("NEW") : ImGui::Text("No changes"));
       ImGui::InputText("topic", s_note.topic, IM_ARRAYSIZE(s_note.topic));
-      ImGui::InputText("tags", buf, IM_ARRAYSIZE(buf));
+      ImGui::InputText("tags", s_note.tags, IM_ARRAYSIZE(s_note.tags));
       ImGui::InputText("created", buf, IM_ARRAYSIZE(buf));
       ImGui::InputText("modified", buf, IM_ARRAYSIZE(buf));
+      ImGui::InputText("origin", s_note.origin, IM_ARRAYSIZE(s_note.origin));
       editor.Render("TextEditor");
       ImGui::End();
     }
@@ -265,14 +272,17 @@ namespace user {
     // 2do, compensate text editor delay
     // (1) https://github.com/ChemistAion/ImTextEdit ... hmm,jo aber liegt nicht am TextEditor, Problem auch bei InputText
     // (2) https://github.com/ocornut/imgui/issues/1485
+    // chatgpt: To detect which item in an ImGui ListBox was clicked with the mouse, you should not rely on the old ListBox() API (it does not provide per-item click events).
     if (ImGui::IsMouseClicked(0) && item_current >= 0) {
+      printf("klicked");
+//      mouse_clicked = true;
       std::string sid = std::to_string(db::rows_id[item_current]);
-      std::string topic = db::sql_string("SELECT topic from notes WHERE id=" + sid + ";"); // Ugly, but works
+      std::string topic = db::sql_string("SELECT topic from notes WHERE rowid=" + sid + ";"); // Ugly, but works
       strcpy(s_note.topic,topic.c_str());
-      std::string note = db::sql_string("SELECT note from notes WHERE id="+sid+";");
+      std::string note = db::sql_string("SELECT note from notes WHERE rowid="+sid+";");
       user::editor.SetText(note);
 //      user::editor.Render("TextEditor");
-      item_current = -1;
+//      item_current = -1;
     }
   }
 
