@@ -138,7 +138,7 @@ namespace db {
   static int callback_rows(void* data, int argc, char** argv, char** azColName) {
     int i;
     fprintf(stderr, "%s: ", (const char*)data);
-
+// 2do: need to take care if value is NULL !!
 ///    for (i = 0; i < argc; i++) {
       rows_val.push_back(argv[1]);
 //      rows_val.insert(rows_val.end(), argv[i], argv[i] + strlen(argv[i]));
@@ -219,7 +219,7 @@ namespace db {
     std::string buf_ = buf;
     /* Create SQL statement */
 //    std::string sql = "SELECT * FROM notes WHERE note LIKE '%" + buf_ + "%';";
-    std::string sql = "SELECT id, topic FROM notes WHERE note LIKE '%" + buf_ + "%';";
+    std::string sql = "SELECT rowid, topic FROM notes WHERE note LIKE '%" + buf_ + "%';";
 
     rows_val.clear();
     /* Execute SQL statement */

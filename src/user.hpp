@@ -18,16 +18,17 @@ namespace user {
   static int dmx, dmy; // mouse-delta
 
   std::vector<const char*> list_items;
-  static int item_current = 1;
+///  static int item_current = 1;
   char prevbuf[256];
 // s. database.hpp -->  struct note { ... };
+  static int item_selected = 1;
 
   enum e_STATE { STATE_NONE, STATE_NEW, STATE_EDIT };
-  e_STATE curr_state = STATE_NONE;
+  e_STATE curr_state = STATE_EDIT;
 
   db::s_Note s_note;
 
-  bool mouse_clicked = false;
+  ///  bool mouse_clicked = false;
 
 //  bool b_cfg_changed{ false };
   namespace insta {
@@ -189,14 +190,54 @@ namespace user {
     }
   } // Imgui_io
 
+  bool ListBoxSelectable(
+    const char* label,
+    int* current_item,
+//    const std::vector<std::string>& items,
+    const std::vector<const char*>& items,
+    int height_in_items = 8
+  )
+  {
+    bool changed = false;
+
+    float item_height = ImGui::GetTextLineHeightWithSpacing();
+    ImVec2 size = ImVec2(0, item_height * height_in_items);
+
+    ImGui::BeginGroup();
+    ImGui::TextUnformatted(label);
+
+    // A unique ID helps avoid collisions if used multiple times
+    ImGui::PushID(label);
+
+    if (ImGui::BeginChild("##listbox", size, true))
+    {
+      for (int i = 0; i < items.size(); i++)
+      {
+        bool is_selected = (i == *current_item);
+
+        if (ImGui::Selectable(items[i], is_selected))
+        {
+          *current_item = i;
+          changed = true;
+        }
+      }
+    }
+
+    ImGui::EndChild();
+    ImGui::PopID();
+    ImGui::EndGroup();
+
+    return changed;
+  }
+
   void update_detail() {
-    std::string sid = std::to_string(db::rows_id[item_current]);
+    std::string sid = std::to_string(db::rows_id[item_selected]);
     std::string topic = db::sql_string("SELECT topic from notes WHERE rowid=" + sid + ";"); // Ugly, but works
     strcpy(s_note.topic, topic.c_str());
     std::string note = db::sql_string("SELECT note from notes WHERE rowid=" + sid + ";");
     user::editor.SetText(note);
-    item_current = -1;
-    mouse_clicked = false;
+///    item_current = -1;
+///    mouse_clicked = false;
   }
 
   void Imgui_draw(SDL_Window* window, ImGuiIO& io) {
@@ -217,11 +258,34 @@ namespace user {
       }
       strcpy_s(prevbuf, sizeof(prevbuf), buf);
 
-      if (mouse_clicked) update_detail();
+///      if (mouse_clicked) update_detail();
       // fill listbox with topics from DB
-      ImGui::ListBox("topics", &item_current, list_items.data(), static_cast<int>(list_items.size()), 30);
-      if (ImGui::IsItemHovered()) ImGui::SetTooltip("ListBox hovered %d", item_current);
-      printf("%d", item_current);
+//      ImGui::ListBox("topics", &item_current, list_items.data(), static_cast<int>(list_items.size()), 30);
+//      if (ImGui::IsItemHovered()) ImGui::SetTooltip("ListBox hovered %d", item_current);
+/*      if (ImGui::BeginListBox("topics"))
+      {
+        for (int i = 0; i < list_items.size(); i++)
+        {
+          bool is_selected = (i == item_selected);
+          if (ImGui::Selectable(list_items[i], is_selected))
+          {
+            // This runs when the user clicks the item
+            item_selected = i;
+            // Do whatever you want on click
+            printf("Clicked item: %d\n", i);
+            update_detail();
+          }
+          if (is_selected) ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndListBox();
+      }
+*/
+///      printf("%d", item_current);
+      if (ListBoxSelectable("topics", &item_selected, list_items, 28))
+      {
+//        printf("Clicked item index = %d\n", item_selected);
+        update_detail();
+      }
       ImGui::End();
 
 
@@ -230,7 +294,7 @@ namespace user {
         user::editor.SetText("");
         s_note.topic[0] = '\0';
         s_note.tags[0] = '\0';
-        item_current = -1;
+///        item_current = -1;
         curr_state = STATE_NEW;
       }
       ImGui::SameLine();
@@ -267,7 +331,7 @@ namespace user {
   }
 
   void Imgui_events() {
-    static bool selected = false;
+/*    static bool selected = false;
 
     // 2do, compensate text editor delay
     // (1) https://github.com/ChemistAion/ImTextEdit ... hmm,jo aber liegt nicht am TextEditor, Problem auch bei InputText
@@ -284,6 +348,7 @@ namespace user {
 //      user::editor.Render("TextEditor");
 //      item_current = -1;
     }
+*/
   }
 
 } // namespace user
