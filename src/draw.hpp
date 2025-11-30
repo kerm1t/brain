@@ -12,7 +12,7 @@
 #include "math/linmath.h"
 ///#include "features/freespace.h" // <-- verallgemeinern!! s. CompGEN
 
-ImVec4 clear_color = ImVec4(90 / 255.0, 90 / 255.0, 20 / 255.0, 1.00f);
+ImVec4 clear_color = ImVec4(bg_color[0] / 255.0, bg_color[1] / 255.0, bg_color[2] / 255.0, 1.00f);
 ImVec4 overrunnable_color = ImVec4(0.0f,1.0f,0.0f, 1.00f);
 ImVec4 overridable_color = ImVec4(1.0f, 1.0f,0.0f, 1.00f);
 ImVec4 obstacle_color = ImVec4(0.9f, 0.0f, 0.6f, 1.00f);
