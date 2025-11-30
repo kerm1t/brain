@@ -20,7 +20,7 @@ SDL_Window* init_SDL()
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);  // Double Buffering aktivieren
 
   // Fenster erzeugen
-  window = SDL_CreateWindow(APP_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+  window = SDL_CreateWindow(APP_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win_w, win_h, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   return window;
 }
 
@@ -61,8 +61,8 @@ ImGuiIO& init_Imgui(SDL_Window* window, SDL_GLContext gl_context) {
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
   // Setup Dear ImGui style
-  ImGui::StyleColorsDark();
-  //ImGui::StyleColorsLight();
+  //ImGui::StyleColorsDark();
+  ImGui::StyleColorsLight();
 
   // Setup Platform/Renderer backends
   ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
