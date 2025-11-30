@@ -14,6 +14,8 @@
 #include "database.hpp"
 
 namespace user {
+  ImGuiIO io;
+
   static int mx, my; // mouse-pos
   static int dmx, dmy; // mouse-delta
 
@@ -73,7 +75,7 @@ namespace user {
   }
 
   void process_event(SDL_Event& event) { // this is SDL --> move it to ImGUI
-    if (event.type == SDL_MOUSEWHEEL)
+    if (event.type == SDL_MOUSEWHEEL && !io.WantCaptureMouse)
     {
       if (event.wheel.y > 0) // scroll up
       {
@@ -132,7 +134,7 @@ namespace user {
   }
 
   void user_event_SDL(SDL_Event& event) { // this is SDL --> move it to ImGUI
-    if (event.type == SDL_MOUSEWHEEL)
+    if (event.type == SDL_MOUSEWHEEL && !io.WantCaptureMouse)
     {
       if (event.wheel.y > 0) // scroll up
       {
@@ -143,6 +145,28 @@ namespace user {
         zoom -= 1.0f;
       }
     }
+    dmx = mx - event.motion.x;
+    dmy = my - event.motion.y;
+    // https://stackoverflow.com/questions/27536941/sdl-mouse-input
+    if ((event.type == SDL_MOUSEMOTION) && (event.motion.state & SDL_BUTTON_LMASK) && !io.WantCaptureMouse)//event.button.button == SDL_BUTTON_LEFT)
+    {
+      cam.rot[0] += dmx * 3.14159f / 180.0f;
+      cam.rot[1] += dmy * 3.14159f / 180.0f;
+    }
+    if ((event.type == SDL_MOUSEMOTION) && (event.motion.state & SDL_BUTTON_RMASK) && !io.WantCaptureMouse)
+    {
+      cam.trans[0] += dmx;
+      cam.trans[2] -= dmy;
+    }
+    if ((event.type == SDL_MOUSEMOTION) && (event.motion.state & SDL_BUTTON_MMASK) && !io.WantCaptureMouse)
+    {
+      cam.rot[0] += dmy * 3.14159f / 180.0f;
+      cam.rot[2] += dmx * 3.14159f / 180.0f;
+    }
+
+    if (event.motion.x > 0) // check, if mouse moves out of windows (this yields high event.x)
+      mx = event.motion.x;  // or use event.motion.xrel, yrel
+    if (event.motion.y > 0) my = event.motion.y;
   }
 
   void win_event_SDL(SDL_Event& event) {
@@ -159,7 +183,7 @@ namespace user {
     }
   }
 
-  void Imgui_io(ImGuiIO& io) {
+/*  void Imgui_io() {
 ///    if (io.KeysDown[65] == true) // A
 ///    {
 ///      std::cout << "A pressed" << std::endl;
@@ -189,7 +213,8 @@ namespace user {
       cam.rot[2] += dmx * 3.14159f / 180.0f;
     }
   } // Imgui_io
-
+  */
+  // (C) by chatgpt
   bool ListBoxSelectable(
     const char* label,
     int* current_item,

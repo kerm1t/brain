@@ -99,11 +99,11 @@ int main(int argc, char** argv)
 
   init_GL();
 
-  ImGuiIO& io = init_Imgui(window, glContext); // setup Dear ImGui context
+  user::io = init_Imgui(window, glContext); // setup Dear ImGui context
 // Init GFX
 
   user::editor.SetPalette(TextEditor::GetLightPalette());
-  ImGui::StyleColorsLight();
+// s.init  ImGui::StyleColorsLight();
 
   // Loop
   bool close = false;
@@ -111,7 +111,8 @@ int main(int argc, char** argv)
   {
     render(window);
 
-    user::Imgui_draw(window, io);
+    user::io = ImGui::GetIO(); // to be done every frame
+    user::Imgui_draw(window, user::io);
     user::Imgui_events();
 
     bool b_cfg_changed = user::insta_config();
@@ -137,7 +138,7 @@ int main(int argc, char** argv)
       
       user::user_event_SDL(event);
       user::win_event_SDL(event);
-      user::Imgui_io(io);
+//      user::Imgui_io();
 
       if (event.type == SDL_QUIT)
       {
