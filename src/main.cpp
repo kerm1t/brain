@@ -160,7 +160,7 @@ int main(int argc, char** argv)
             break;
         }
     }
-
+    SDL_Delay(10);
   } while (!close);
 
   gpu_free_buffers(); // free point cloud vbo
