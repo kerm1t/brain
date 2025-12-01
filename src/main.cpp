@@ -152,8 +152,9 @@ int main(int argc, char** argv)
     user::win_event_SDL(event);
 
 //    bool quit = false;
-    if (SDL_WaitEvent(&event) != 0) {
-        switch (event.type) {
+//    if (SDL_WaitEvent(&event) != 0) { // <-- only upon Mousemove or Keypress or Window event ... nOK
+    if (SDL_PollEvent(&event) != 0) {
+            switch (event.type) {
         case SDL_QUIT:
             close = true;
             break;
