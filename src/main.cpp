@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 
     // user interaction (mouse, keys, ...)
     SDL_Event event;
-    while (SDL_PollEvent(&event))
+/*    while (SDL_PollEvent(&event))
     {
       ImGui_ImplSDL2_ProcessEvent(&event); // forward SDL events to ImGUI
       
@@ -144,7 +144,22 @@ int main(int argc, char** argv)
       {
         close = true;
       }
+	  SDL_Delay(50); // to reduce CPU load
+    }*/
+
+    ImGui_ImplSDL2_ProcessEvent(&event); // forward SDL events to ImGUI
+    user::user_event_SDL(event);
+    user::win_event_SDL(event);
+
+//    bool quit = false;
+    if (SDL_WaitEvent(&event) != 0) {
+        switch (event.type) {
+        case SDL_QUIT:
+            close = true;
+            break;
+        }
     }
+
   } while (!close);
 
   gpu_free_buffers(); // free point cloud vbo
