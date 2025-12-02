@@ -8,7 +8,7 @@ escapi.sdf
 bld/
 .vs/
 
-lib/
+#lib/ <-- now hosts submodules
 *.log
 *.tmp
 Debug/
