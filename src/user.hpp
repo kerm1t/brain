@@ -12,6 +12,9 @@
 #define USER_HPP
 
 #include "database.hpp"
+#include <fstream>  // write string to file
+#include <string>
+#include <iostream>
 
 namespace user {
   ImGuiIO io;
@@ -31,6 +34,45 @@ namespace user {
   db::s_Note s_note;
 
   ///  bool mouse_clicked = false;
+
+#ifdef _WIN32
+  VOID startup(LPCTSTR lpApplicationName)
+  {
+      LPTSTR lpDatafilename = "c:\\temp\\brain_tmp.txt";// NULL;
+      ShellExecute(NULL, "open", lpApplicationName, lpDatafilename, NULL, SW_SHOWDEFAULT);
+      return;
+      // additional information
+      STARTUPINFO si;
+      PROCESS_INFORMATION pi;
+
+      // set the size of the structures
+      ZeroMemory(&si, sizeof(si));
+      si.cb = sizeof(si);
+      ZeroMemory(&pi, sizeof(pi));
+
+      // start the program up
+      CreateProcess(lpApplicationName,   // the path
+          lpDatafilename,        // Command line
+          NULL,           // Process handle not inheritable
+          NULL,           // Thread handle not inheritable
+          FALSE,          // Set handle inheritance to FALSE
+          0,              // No creation flags
+          NULL,           // Use parent's environment block
+          NULL,           // Use parent's starting directory 
+          &si,            // Pointer to STARTUPINFO structure
+          &pi             // Pointer to PROCESS_INFORMATION structure (removed extra parentheses)
+      );
+      // Close process and thread handles. 
+      CloseHandle(pi.hProcess);
+      CloseHandle(pi.hThread);
+  }
+#endif
+  
+  void to_file(const std::string txt) {
+    std::ofstream out("c:\\temp\\brain_tmp.txt");
+    out << txt;
+    out.close();
+  }
 
 //  bool b_cfg_changed{ false };
   namespace insta {
@@ -342,6 +384,12 @@ namespace user {
       ImGui::SameLine();
       curr_state == STATE_EDIT ? ImGui::Text("EDIT") : 
         (curr_state == STATE_NEW ? ImGui::Text("NEW") : ImGui::Text("No changes"));
+      ImGui::SameLine();
+      if (ImGui::Button("LaTeX editor")) {
+          to_file(editor.GetText());
+          SDL_Delay(50);
+          startup("C:\\winapp\\MiKTeX\\miktex\\bin\\x64\\miktex-texworks.exe");
+      }
       ImGui::InputText("topic", s_note.topic, IM_ARRAYSIZE(s_note.topic));
       ImGui::InputText("tags", s_note.tags, IM_ARRAYSIZE(s_note.tags));
       ImGui::InputText("created", buf, IM_ARRAYSIZE(buf));
