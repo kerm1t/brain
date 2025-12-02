@@ -20,23 +20,26 @@ if(MSVC)
   set (Protobuf_USE_STATIC_LIBS TRUE) 
 endif()
 
-set (SDL2_DIR ./lib/SDL2-2.26.4/cmake)
+set(SDL2_PATH ./lib/SDL-Glew_pkg/SDL2-2.32.6/)
+set(SDL2_DIR ./lib/SDL-Glew_pkg/SDL2-2.32.6/cmake) # for find_package
 find_package(SDL2 REQUIRED)
 
+set(GLEW_DIR ./lib/SDL-Glew_pkg/glew-2.1.0)
 set(glew "glew-2.1.0")
-set(IMGUI_FOLDER imgui)
+set(IMGUI_FOLDER ./lib/imgui)
+set(TEXTEDIT_FOLDER ./lib/ImGuiColorTextEdit)
 
 include_directories(. ./src src/math src/database
-./lib/${glew}/include
+${GLEW_DIR}/include
 ${SDL2_INCLUDE_DIRS}
 ${IMGUI_FOLDER}
 ${IMGUI_FOLDER}/src
 ${IMGUI_FOLDER}/debuggers
-ImGuiColorTextEdit
+${TEXTEDIT_FOLDER}
 )
 
 link_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/./lib/${glew}/lib/release/x64
+  ${CMAKE_CURRENT_SOURCE_DIR}/${GLEW_DIR}/lib/release/x64
   ${CMAKE_CURRENT_SOURCE_DIR}/./lib)
 
 # CMAKE_PROJECT_NAME -> top level project
@@ -50,11 +53,8 @@ ${IMGUI_FOLDER}/imgui_tables.cpp
 ${IMGUI_FOLDER}/imgui_widgets.cpp
 ${IMGUI_FOLDER}/backends/imgui_impl_opengl3.cpp
 ${IMGUI_FOLDER}/backends/imgui_impl_sdl2.cpp
-# 2do: merge these with libLT/(Fox/Point)Cloudhandler.*
-#./hndl_pointcloud.cpp
-#./hndl_pointcloud.h
-ImGuiColorTextEdit/TextEditor.cpp
-ImGuiColorTextEdit/TextEditor.h
+${TEXTEDIT_FOLDER}/TextEditor.cpp
+${TEXTEDIT_FOLDER}/TextEditor.h
 
 src/main.cpp
 src/LT_app.h
@@ -66,13 +66,6 @@ src/draw.hpp
 src/draw_primitives.hpp
 src/shader/start.fs
 src/shader/start.vs
-# rbnn
-#src/cluster.hpp
-#src/kdtree.h
-# dbscan
-#src/dbscan.cpp
-#src/dbscan.hpp
-#src/nanoflann.hpp
 src/math/linmath.h
 src/database.hpp
 src/database/sqlite3.c
@@ -84,4 +77,11 @@ target_link_libraries(${PROJECT_NAME}
 
 if (UNIX)
 target_link_libraries(${PROJECT_NAME} GL SDL2 GLEW ${CMAKE_DL_LIBS})
+endif()
+
+if (MSVC)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+         "${CMAKE_CURRENT_SOURCE_DIR}/${SDL2_PATH}/lib/x64/SDL2.dll"
+         $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 endif()
