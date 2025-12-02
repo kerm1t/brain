@@ -22,7 +22,7 @@
 #include "src/imgui_impl_sdl2.h"
 #include "src/imgui_impl_opengl3.h"
 #endif
-#include "ImGuiColorTextEdit/TextEditor.h"
+#include "TextEditor.h"
 
 #ifdef _WIN32
 #include <SDL.h>
