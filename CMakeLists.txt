@@ -20,12 +20,13 @@ if(MSVC)
   set (Protobuf_USE_STATIC_LIBS TRUE) 
 endif()
 
-set(SDL2_PATH ./lib/SDL-Glew_pkg/SDL2-2.32.6/)
-set(SDL2_DIR ./lib/SDL-Glew_pkg/SDL2-2.32.6/cmake) # for find_package
-find_package(SDL2 REQUIRED)
+set(sdl2 SDL2-2.32.6)
+set(glew glew-2.1.0)
 
-set(GLEW_DIR ./lib/SDL-Glew_pkg/glew-2.1.0)
-set(glew "glew-2.1.0")
+set(SDL2_PATH ./lib/SDL-Glew_pkg/${sdl2}/)
+set(SDL2_DIR ${SDL2_PATH}/cmake) # for find_package
+find_package(SDL2 REQUIRED)
+set(GLEW_DIR ./lib/SDL-Glew_pkg/${glew})
 set(IMGUI_FOLDER ./lib/imgui)
 set(TEXTEDIT_FOLDER ./lib/ImGuiColorTextEdit)
 
